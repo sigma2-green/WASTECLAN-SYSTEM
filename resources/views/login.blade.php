@@ -5,7 +5,8 @@
     <title>Login | WASTECLAN</title>
     <style>
         body {
-            background-color: black;
+            background: url('media/logwaste.jpg') no-repeat center center fixed;
+            background-size: cover;
             color: white;
             font-family: 'Poppins', sans-serif;
             display: flex;
@@ -13,17 +14,29 @@
             justify-content: center;
             height: 100vh;
             margin: 0;
+            position: relative;
+        }
+        /* Dark overlay for readability */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 0;
         }
         .container {
-            background-color: #111;
+            position: relative;
+            z-index: 1; /* above overlay */
+            background-color: rgba(17, 17, 17, 0.9);
             padding: 40px;
             border-radius: 12px;
             width: 400px;
-            box-shadow: 0 0 15px rgba(255,255,255,0.1);
+            box-shadow: 0 0 25px rgba(0,0,0,0.5);
         }
         h2 {
             text-align: center;
-            color: green;
+            color: #00ff00;
             margin-bottom: 25px;
         }
         label { display: block; margin: 10px 0 5px; }
@@ -35,25 +48,29 @@
             background-color: #222;
             color: white;
         }
-        input:focus { outline: 2px solid green; }
+        input:focus { outline: 2px solid #00ff00; }
         button {
             width: 100%;
             margin-top: 20px;
-            background-color: green;
-            color: white;
+            background-color: #00ff00;
+            color: black;
             border: none;
             padding: 12px;
             border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
+            
         }
-        button:hover { background-color: darkgreen; }
+        button:hover { 
+            background-color: #00cc00; 
+        }
+
         p {
             text-align: center;
             margin-top: 20px;
         }
         a {
-            color: green;
+            color: #00ff00;
             text-decoration: none;
         }
         a:hover { text-decoration: underline; }
@@ -61,19 +78,20 @@
 </head>
 <body>
 <div class="container">
-    <h2>Login to WASTECLAN</h2>
+    <h2>LOGIN</h2>
     <form method="POST" action="{{ route('login.post') }}">
         @csrf
         <label for="email">Email Address</label>
-        <input type="email" id="email" name="email" required>
+        <input type="email" id="email" name="email" required autofocus>
 
         <label for="password">Password</label>
         <input type="password" id="password" name="password" required>
 
         <button type="submit">Login</button>
 
-        <p>Don't have an account? <a href="{{ route('sign-up.form') }}">Sign Up</a></p>
+        <p>Don't have an account? Please <a href="{{ route('sign-up.form') }}">Sign Up</a></p>
     </form>
 </div>
 </body>
 </html>
+
