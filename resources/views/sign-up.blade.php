@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Sign Up | WASTECLAN</title>
+    <title>Sign Up </title>
     <style>
         body {
             background: url('media/logwaste.jpg') no-repeat center center fixed;
