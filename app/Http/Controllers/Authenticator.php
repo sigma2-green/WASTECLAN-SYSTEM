@@ -9,60 +9,86 @@ use App\Models\User;
 
 class Authenticator extends Controller
 {
+    /**
+     * Show the sign-up form
+     */
     public function showSignupForm()
     {
         return view('sign-up');
     }
 
+    /**
+     * Handle new user registration
+     */
     public function processSignup(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
         ]);
 
+        // Create and save user
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
         ]);
 
+        // Automatically log in the new user
         Auth::login($user);
 
+        // Redirect to dashboard
         return redirect()->route('dashboard')->with('success', 'Account created successfully!');
     }
 
+    /**
+     * Show login form
+     */
     public function showLoginForm()
     {
+        // If already logged in, go to dashboard
+        if (Auth::check()) {
+            return redirect()->route('dashboard');
+        }
+
         return view('login');
     }
 
+    /**
+     * Handle login request
+     */
     public function login(Request $request)
     {
         $credentials = $request->validate([
             'email' => 'required|email',
-            'password' => 'required',
+            'password' => 'required|string',
         ]);
 
-        if (Auth::attempt($credentials)) {
+        if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
-            return redirect()->route('dashboard');
+
+            return redirect()->route('dashboard')->with('success', 'Welcome back, ' . Auth::user()->name . '!');
         }
 
         return back()->withErrors([
-            'email' => 'Invalid credentials.',
-        ]);
+            'email' => 'Invalid credentials, please try again.',
+        ])->onlyInput('email');
     }
 
+    /**
+     * Log out the user
+     */
     public function logout(Request $request)
     {
         Auth::logout();
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/login')->with('success', 'Logged out successfully.');
+        return redirect()->route('login.form')->with('success', 'Logged out successfully.');
     }
 }
+
 
 

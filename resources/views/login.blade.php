@@ -27,7 +27,7 @@
         }
         .container {
             position: relative;
-            z-index: 1; /* above overlay */
+            z-index: 1;
             background-color: rgba(17, 17, 17, 0.9);
             padding: 40px;
             border-radius: 12px;
@@ -59,12 +59,9 @@
             border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
-            
+            transition: background 0.3s;
         }
-        button:hover { 
-            background-color: #00cc00; 
-        }
-
+        button:hover { background-color: #00cc00; }
         p {
             text-align: center;
             margin-top: 20px;
@@ -74,15 +71,36 @@
             text-decoration: none;
         }
         a:hover { text-decoration: underline; }
+        .error, .success {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            text-align: center;
+        }
+        .error { background-color: #ff4d4d; color: white; }
+        .success { background-color: #00cc00; color: black; }
     </style>
 </head>
 <body>
 <div class="container">
     <h2>LOGIN</h2>
+
+    {{-- ✅ Flash messages --}}
+    @if (session('success'))
+        <div class="success">{{ session('success') }}</div>
+    @endif
+
+    @if ($errors->any())
+        <div class="error">
+            {{ $errors->first() }}
+        </div>
+    @endif
+
     <form method="POST" action="{{ route('login.post') }}">
         @csrf
         <label for="email">Email Address</label>
-        <input type="email" id="email" name="email" required autofocus>
+        <input type="email" id="email" name="email" value="{{ old('email') }}" required autofocus>
 
         <label for="password">Password</label>
         <input type="password" id="password" name="password" required>
@@ -94,4 +112,5 @@
 </div>
 </body>
 </html>
+
 

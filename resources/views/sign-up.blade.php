@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Sign Up </title>
+    <title>Sign Up</title>
     <style>
         body {
-            background: url('media/logwaste.jpg') no-repeat center center fixed;
+            background: url('{{ asset('media/logwaste.jpg') }}') no-repeat center center fixed;
             background-size: cover;
             color: white;
             font-family: 'Poppins', sans-serif;
@@ -17,7 +17,6 @@
             position: relative;
         }
 
-        /* Dark overlay for readability */
         body::before {
             content: "";
             position: absolute;
@@ -90,21 +89,38 @@
 <body>
 <div class="container">
     <h2>Create an Account</h2>
+    
+    {{-- Display validation errors --}}
+    @if ($errors->any())
+        <div style="color: red; margin-bottom: 15px;">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <form method="POST" action="{{ route('sign-up.post') }}">
         @csrf
+
         <label for="name">Full Name</label>
-        <input type="text" id="name" name="name" required>
+        <input type="text" id="name" name="name" value="{{ old('name') }}" required>
 
         <label for="email">Email Address</label>
-        <input type="email" id="email" name="email" required>
+        <input type="email" id="email" name="email" value="{{ old('email') }}" required>
 
         <label for="password">Password</label>
         <input type="password" id="password" name="password" required>
 
+        <label for="password_confirmation">Confirm Password</label>
+        <input type="password" id="password_confirmation" name="password_confirmation" required>
+
         <button type="submit">Sign Up</button>
 
-        <p>Already have an account? <a href="{{ route('login') }}">Login</a></p>
+        <p>Already have an account? <a href="{{ route('login.form') }}">Login</a></p>
     </form>
 </div>
 </body>
 </html>
+

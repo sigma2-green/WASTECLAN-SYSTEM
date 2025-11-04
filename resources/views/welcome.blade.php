@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>WASTECLAN | Waste Management System</title>
+    <title> Waste Management System</title>
     <style>
         * {
             margin: 0;
@@ -155,7 +155,7 @@
         <h1>Welcome</h1>
 
         <div class="auth-buttons">
-            <a href="{{ route('login') }}">Login</a>
+            <a href="{{ route('login.form') }}">Login</a>
             <a href="{{ route('sign-up.form') }}">Sign Up</a>
         </div>
     </div>
@@ -167,7 +167,7 @@
             <a href="#">Privacy Policy</a> |
             <a href="#">Terms of Service</a>
         </div>
-        <p>© 2025 WASTECLAN. All Rights Reserved. |  ♻️ for a greener tomorrow.</p>
+        <p>© 2025 . All Rights Reserved. |  ♻️ for a greener tomorrow.</p>
     </footer>
 
 </body>
