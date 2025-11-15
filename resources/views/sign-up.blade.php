@@ -12,7 +12,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            height: 150vh;
             margin: 0;
             position: relative;
         }
@@ -23,13 +23,13 @@
             top: 0; left: 0;
             width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.5);
-            z-index: 0;
+            z-index: 1;
         }
 
         .container {
             position: relative;
             z-index: 1;
-            background-color: rgba(17, 17, 17, 0.9);
+            background-color: rgba(17, 17, 17,0.9);
             padding: 40px;
             border-radius: 12px;
             width: 400px;
@@ -42,12 +42,30 @@
             margin-bottom: 25px;
         }
 
-        label { 
-            display: block; 
-            margin: 10px 0 5px; 
+        /* Avatar Circle */
+        .avatar-wrapper {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid #00ff00;
+            margin: 0 auto 20px auto;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #222;
         }
 
-        input {
+        .avatar-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        label { display: block; margin: 10px 0 5px; }
+
+        input, select {
             width: 100%;
             padding: 12px;
             border-radius: 8px;
@@ -84,12 +102,16 @@
         }
 
         a:hover { text-decoration: underline; }
+
+        #profile_photo {
+            display: none; /* hide the file input */
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <h2>Create an Account</h2>
-    
+
     {{-- Display validation errors --}}
     @if ($errors->any())
         <div style="color: red; margin-bottom: 15px;">
@@ -101,8 +123,15 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('sign-up.post') }}">
+    <form method="POST" action="{{ route('sign-up.post') }}" enctype="multipart/form-data">
         @csrf
+
+        <!-- Clickable Circular Avatar -->
+        <div class="avatar-wrapper" onclick="document.getElementById('profile_photo').click()">
+            <img id="avatarPreview" src="{{ asset('media/default-avatar.png') }}">
+        </div>
+
+        <input type="file" id="profile_photo" name="profile_photo" accept="image/*" onchange="previewAvatar(event)">
 
         <label for="name">Full Name</label>
         <input type="text" id="name" name="name" value="{{ old('name') }}" required>
@@ -116,11 +145,42 @@
         <label for="password_confirmation">Confirm Password</label>
         <input type="password" id="password_confirmation" name="password_confirmation" required>
 
+        <label for="role">Register as:</label>
+        <select name="role" id="role" required>
+            <option value="resident">Resident</option>
+
+            @if(Auth::check() && Auth::user()->role === 'admin')
+                <option value="collector">Collector</option>
+                <option value="admin">Admin</option>
+            @endif
+        </select>
+
+        <div>
+    <label class="block font-medium">Address</label>
+    <input type="text" name="address" value="{{ old('address') }}"
+           class="w-full border p-2 rounded" placeholder="Enter your address">
+    </div>
+
+
         <button type="submit">Sign Up</button>
 
-        <p>Already have an account? <a href="{{ route('login.form') }}">Login</a></p>
+        <p>Already have an account?  
+            <a href="{{ route('login.form') }}">Login</a>
+        </p>
     </form>
 </div>
+
+<script>
+    function previewAvatar(event) {
+        const reader = new FileReader();
+        reader.onload = function(){
+            document.getElementById('avatarPreview').src = reader.result;
+        }
+        reader.readAsDataURL(event.target.files[0]);
+    }
+</script>
+
 </body>
 </html>
+
 

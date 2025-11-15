@@ -1,3 +1,8 @@
-<div>
-    <!-- The only way to do great work is to love what you do. - Steve Jobs -->
-</div>
+@extends('layout.app')
+
+@section('title','ADMIN DASHBOARD')
+
+@section('content')
+<!--EDIT TO A DESIRABLE COLLECTOR dashboard-->
+
+@endsection

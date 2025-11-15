@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string('password')->nullable();
             $table->string('phone')->nullable();
             $table->enum('role', ['resident', 'collector', 'admin'])->default('resident');
+            $table->string('profile_photo')->nullable()->after('password');
+            $table->string('avatar')->nullable()->after('password');
             $table->rememberToken();
             $table->timestamps();
         });
@@ -47,6 +49,16 @@ return new class extends Migration
         Schema::dropIfExists('sessions');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('users');
+
+        Schema::table('users', function (Blueprint $table) {
+        $table->dropColumn('profile_photo');
+    });
+
+        Schema::table('users', function (Blueprint $table) {
+        $table->dropColumn('avatar');
+    });
+
+
     }
 };
 

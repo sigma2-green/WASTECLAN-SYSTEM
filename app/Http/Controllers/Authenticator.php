@@ -20,34 +20,49 @@ class Authenticator extends Controller
     /**
      * Handle new user registration
      */
-    public function processSignup(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6|confirmed',
+   public function processSignup(Request $request)
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255|unique:users',
+        'password' => 'required|string|min:6|confirmed',
+        'role' => 'required|in:resident,collector', // remove admin signup from here
+        'phone' => 'nullable|string|max:20',
+        'profile_photo' => 'nullable|image|max:2048',
+    ]);
+
+    // Store profile photo if uploaded
+    $photoPath = $request->hasFile('profile_photo')
+        ? $request->file('profile_photo')->store('profile_photos', 'public')
+        : null;
+
+    // Create user
+    $user = User::create([
+        'name' => $validated['name'],
+        'email' => $validated['email'],
+        'password' => Hash::make($validated['password']),
+        'role' => $validated['role'],
+        'phone' => $validated['phone'] ?? null,
+        'profile_photo' => $photoPath,
+    ]);
+
+    // If role is resident, create resident profile automatically
+    if ($user->role === 'resident') {
+        $user->resident()->create([
+            'address' => $request->input('address') ?? '',
+            // Add other fields if needed
         ]);
-
-        // Create and save user
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-        ]);
-
-        // Automatically log in the new user
-        Auth::login($user);
-
-        // Redirect to dashboard
-        return redirect()->route('dashboard')->with('success', 'Account created successfully!');
     }
+
+    return redirect()->route('login.form')->with('success', 'Account created successfully! Please log in.');
+}
+
 
     /**
      * Show login form
      */
     public function showLoginForm()
     {
-        // If already logged in, go to dashboard
         if (Auth::check()) {
             return redirect()->route('dashboard');
         }
@@ -56,7 +71,7 @@ class Authenticator extends Controller
     }
 
     /**
-     * Handle login request
+     * Handle login
      */
     public function login(Request $request)
     {
@@ -68,27 +83,103 @@ class Authenticator extends Controller
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
-            return redirect()->route('dashboard')->with('success', 'Welcome back, ' . Auth::user()->name . '!');
+            $user = Auth::user();
+
+            if ($user->role === 'admin') {
+                return redirect()->route('admin.dashboard');
+            } elseif ($user->role === 'collector') {
+                return redirect()->route('collector.dashboard');
+            }
+            return redirect()->route('dashboard');
         }
 
-        return back()->withErrors([
-            'email' => 'Invalid credentials, please try again.',
-        ])->onlyInput('email');
+        return back()->withErrors(['email' => 'Invalid credentials'])->onlyInput('email');
     }
 
     /**
-     * Log out the user
+     * Logout
      */
     public function logout(Request $request)
     {
         Auth::logout();
-
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login.form')->with('success', 'Logged out successfully.');
+        return redirect()->route('home');
     }
+
+    /**
+     * Show user profile
+     */
+    public function profile()
+    {
+        $user = Auth::user();
+        return view('profile', compact('user'));
+    }
+
+    /**
+     * Edit profile
+     */
+    public function editProfile()
+    {
+        $user = Auth::user();
+        return view('residents.edit', compact('user'));
+    }
+
+    /**
+     * Update profile details
+     */
+    public function updateProfile(Request $request)
+{
+    $user = auth()->user();
+
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+        'phone' => 'nullable|string|max:20',
+        'profile_photo' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
+    ]);
+
+    if ($request->hasFile('profile_photo')) {
+        $path = $request->file('profile_photo')->store('profile_photos', 'public');
+        $user->profile_photo = $path;
+    }
+
+    $user->name = $request->name;
+    $user->email = $request->email;
+    $user->phone = $request->phone;
+    $user->save();
+
+    return redirect()->route('profile')->with('success', 'Profile updated successfully!');
 }
+    /**
+     * Change password
+     */
+    public function changePassword(Request $request)
+    {
+        $user = Auth::user();
+
+        $request->validate([
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:6|confirmed',
+        ]);
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'Current password is incorrect.']);
+        }
+
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return redirect()->route('profile')->with('success', 'Password changed successfully!');
+    }
+
+
+
+}
+
+
+
 
 
 

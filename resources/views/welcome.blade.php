@@ -146,7 +146,7 @@
     <nav>
         <div class="logo">♻️ </div>
         <div class="nav-links">
-            <a href="#">Dashboard</a>
+            <a href="{{ route('dashboard') }}">Dashboard</a>
             <a href="#">Profile</a>
         </div>
     </nav>
@@ -167,7 +167,7 @@
             <a href="#">Privacy Policy</a> |
             <a href="#">Terms of Service</a>
         </div>
-        <p>© 2025 . All Rights Reserved. |  ♻️ for a greener tomorrow.</p>
+        <p>© 2025 . All Rights Reserved. |  ♻️ for a greener tommorrow.</p>
     </footer>
 
 </body>

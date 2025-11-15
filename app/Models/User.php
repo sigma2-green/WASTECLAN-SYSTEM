@@ -10,44 +10,102 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    protected $primaryKey = 'id'; // Use if your PK isn’t 'id'
+    /**
+     * The primary key for the model.
+     */
+    protected $primaryKey = 'id';
 
+    /**
+     * The attributes that are mass assignable.
+     */
     protected $fillable = [
         'name',
         'email',
         'password',
         'role',
         'phone',
+        'profile_photo',
+        'avatar',
     ];
 
-
+    /**
+     * The attributes that should be hidden for arrays.
+     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    // 🏠 Relationship: one user → one resident profile
-    /*public function resident()
-    {
-        return $this->hasOne(Resident::class, 'resident_id');
-    } 
-    
-    // 🚛 Relationship: one user → one collector profile
-    /*public function collector()
-    {
-        return $this->hasOne(Collector::class, 'collector_id');
-    }*/
+    /**
+     * The attributes that should be cast to native types.
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
 
-    // 📋 Relationship: user → many reports
-   /* public function reports()
-    {
-        return $this->hasMany(Report::class, 'user_id');
-    }*/
+    /* ==========================
+     |  RELATIONSHIPS
+     ========================== */
 
-    // 💰 Relationship: user → many incentive transactions
-    /*public function incentiveTransactions()
+    /**
+     * 🏠 Each user (resident) may have one resident profile.
+     */
+    public function resident()
     {
-        return $this->hasMany(IncentiveTransaction::class, 'user_id');
-    }*/
+        return $this->hasOne(Resident::class, 'user_id');
+    }
+
+    /**
+     * 🚛 Each user (collector) may have one collector profile.
+     */
+    public function collector()
+    {
+        return $this->hasOne(Collection::class, 'user_id');
+    }
+
+    /**
+     * 📋 A user can submit many reports.
+     */
+    public function reports()
+    {
+        return $this->hasMany(Issue::class, 'user_id');
+    }
+
+    /**
+     * 💰 A user can have many incentive transactions.
+     */
+    public function incentiveTransactions()
+    {
+        return $this->hasMany(Incentive::class, 'user_id');
+    }
+
+    /* ==========================
+     |  ROLE HELPERS
+     ========================== */
+
+    /**
+     * Check if user is an admin.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Check if user is a collector.
+     */
+    public function isCollector(): bool
+    {
+        return $this->role === 'collector';
+    }
+
+    /**
+     * Check if user is a resident.
+     */
+    public function isResident(): bool
+    {
+        return $this->role === 'resident';
+    }
 }
+
 

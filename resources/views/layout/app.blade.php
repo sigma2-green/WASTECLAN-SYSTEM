@@ -9,8 +9,17 @@
         body {
             font-family: 'Poppins', sans-serif;
             margin: 0;
-            padding: 0;
-            background-color: white;
+            padding: 0; 
+            background-color: black ;
+            color:antiquewhite;
+            display:flex;
+            flex-direction:column;
+        }
+        
+        main{
+            flex:1;
+            justify-content: center;
+            align-items:center;
         }
 
         nav {
@@ -39,11 +48,11 @@
         }
 
         .nav-links a:hover {
-            color: darkgreen;
+            text-decoration: underline;
         }
 
         footer {
-            background-color: rgba(0, 0, 0, 0.7);
+            background-color: gray;
             color: #ccc;
             text-align: center;
             padding: 30px 10px;
@@ -69,7 +78,7 @@
     @include('reuse.navbar')
 
     {{-- Page Content --}}
-    <main>
+    <main style="flex:1;">
         @yield('content')
     </main>
 
