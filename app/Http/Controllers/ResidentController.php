@@ -6,9 +6,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Resident;
 use App\Models\User;
+use \Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+
 
 class ResidentController extends Controller
 {
+    use AuthorizesRequests;
+   
     /**
      * Display a listing of residents (admin only)
      */
@@ -86,14 +90,24 @@ class ResidentController extends Controller
     // Show settings page
 public function settings()
 {
-    $user = auth()->user();
+    $user = Auth::user();
     return view('settings', compact('user'));
 }
+
+public function viewSortingGuides()
+{
+    $sortingGuides = \App\Models\SafetyReport::where('report_type', 'sorting_guide')
+                        ->latest()
+                        ->get();
+
+    return view('residents.sorting', compact('sortingGuides'));
+}
+
 
 // Delete account
 public function destroyAccount(Request $request)
 {
-    $user = auth()->user();
+    $user = Auth::user();
 
     // Optional: require password confirmation
     $request->validate([
@@ -114,6 +128,7 @@ public function destroyAccount(Request $request)
 
     return redirect('/')->with('success', 'Your account has been deleted successfully.');
 }
+
 
 }
 

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 
+
 class Authenticator extends Controller
 {
     /**
@@ -64,7 +65,7 @@ class Authenticator extends Controller
     public function showLoginForm()
     {
         if (Auth::check()) {
-            return redirect()->route('dashboard');
+            return redirect()->route('resident.dashboard');
         }
 
         return view('login');
@@ -90,7 +91,7 @@ class Authenticator extends Controller
             } elseif ($user->role === 'collector') {
                 return redirect()->route('collector.dashboard');
             }
-            return redirect()->route('dashboard');
+            return redirect()->route('resident.dashboard');
         }
 
         return back()->withErrors(['email' => 'Invalid credentials'])->onlyInput('email');
@@ -131,7 +132,7 @@ class Authenticator extends Controller
      */
     public function updateProfile(Request $request)
 {
-    $user = auth()->user();
+    $user = Auth::user();
 
     $request->validate([
         'name' => 'required|string|max:255',

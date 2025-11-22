@@ -17,9 +17,7 @@ use Illuminate\Support\Facades\Route;
 // ----------------------------
 // Home
 // ----------------------------
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+Route::get('/', fn() => view('welcome'))->name('home');
 
 // ----------------------------
 // Sign-up routes
@@ -39,86 +37,101 @@ Route::post('/login', [Authenticator::class, 'login'])->name('login.post');
 Route::post('/logout', [Authenticator::class, 'logout'])->name('logout');
 
 // ----------------------------
-// Dashboard (protected)
-// ----------------------------
-Route::get('/dashboard', function () {
-    return view('3.dashboard');
-})->middleware('auth')->name('dashboard');
-
-// ----------------------------
-// Profile routes (universal for all users)
+// Dashboards by role
 // ----------------------------
 Route::middleware('auth')->group(function () {
+
+    // Resident dashboard
+    Route::get('/dashboard', function () {
+        if (auth()->user()->role !== 'resident') abort(403, 'Unauthorized');
+        return view('3.dashboard');
+    })->name('resident.dashboard');
+
+    // Collector dashboard
+    Route::get('/collector', function () {
+        if (auth()->user()->role !== 'collector') abort(403, 'Unauthorized');
+        return view('3.collector');
+    })->name('collector.dashboard');
+
+    Route::get('/collectors/routes', function () {
+        if (auth()->user()->role !== 'collector') abort(403);
+        return view('collectors.routes');
+    })->name('routes');
+
+    Route::get('/collectors/bin', function () {
+        if (auth()->user()->role !== 'collector') abort(403);
+        return view('collectors.bin');
+    })->name('bins');
+
+    Route::get('/collectors/safety-reports', function () {
+        if (auth()->user()->role !== 'collector') abort(403);
+        return view('collector.safety_reports');
+    })->name('safety_reports');
+
+    Route::resource('safety-reports', SafetyReportController::class);
+
+    // Admin dashboard
+    Route::get('/admin', function () {
+        if (auth()->user()->role !== 'admin') abort(403, 'Unauthorized');
+        return view('3.admin');
+    })->name('admin.dashboard');
+
+    Route::get('/admin/analytics', function () {
+        if (auth()->user()->role !== 'admin') abort(403);
+        return view('admin.analytics');
+    })->name('analytics');
+
+    Route::get('/admin/manage_collection', function () {
+        if (auth()->user()->role !== 'admin') abort(403);
+        return view('admin.manage_collection');
+    })->name('manage_collection');
+
+    Route::get('/admin/report_management', function () {
+        if (auth()->user()->role !== 'admin') abort(403);
+        return view('admin.report_management');
+    })->name('report_management');
+
+    // ----------------------------
+    // Profile routes (universal)
+    // ----------------------------
     Route::get('/profile', [Authenticator::class, 'profile'])->name('profile');
     Route::get('/profile/edit', [Authenticator::class, 'editProfile'])->name('profile.edit');
     Route::post('/profile/update', [Authenticator::class, 'updateProfile'])->name('profile.update');
-});
 
-// ----------------------------
-// Resident dashboard routes
-// ----------------------------
-Route::middleware('auth')->group(function () {
-    Route::view('/collect', 'residents.collect')->name('collect');
-    Route::view('/issues', 'residents.issues')->name('issues');
+    // ----------------------------
+    // Resident-specific routes
+    // ----------------------------
+    Route::get('/collect', function () {
+        if (auth()->user()->role !== 'resident') abort(403);
+        return view('residents.collect');
+    })->name('collect');
 
-    // Resource routes
+    Route::get('/issues', function () {
+        if (auth()->user()->role !== 'resident') abort(403);
+        return view('residents.issues');
+    })->name('issues');
+
     Route::resource('residents', ResidentController::class);
     Route::resource('bins', BinController::class);
     Route::resource('pickups', PickupController::class);
     Route::resource('reports', ReportController::class);
-
-    // Sorting routes
     Route::resource('sortings', SortingController::class);
-
-    // Incentives
     Route::resource('incentives', IncentiveController::class);
-});
 
-// ----------------------------
-// Collector dashboard routes
-// ----------------------------
-Route::middleware(['auth', 'role:collector'])->group(function () {
-    Route::get('/collector', fn() => view('3.collector'))->name('collector.dashboard');
-    Route::get('/collectors/routes', fn() => view('collectors.routes'))->name('routes');
-    Route::get('/collectors/bin', fn() => view('collectors.bin'))->name('bins');
-    Route::get('/collectors/safety-reports', fn() => view('collector.safety_reports'))->name('safety_reports');
-
-    Route::resource('safety-reports', SafetyReportController::class);
-});
-
-// ----------------------------
-// Admin dashboard routes
-// ----------------------------
-Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/admin', fn() => view('3.admin'))->name('admin');
-    Route::get('/admin/analytics', fn() => view('admin.analytics'))->name('analytics');
-    Route::get('/admin/manage_collection', fn() => view('admin.manage_collection'))->name('manage_collection');
-    Route::get('/admin/report_management', fn() => view('admin.report_management'))->name('report_management');
-});
-
-// ----------------------------
-// Other resource routes
-// ----------------------------
-Route::resource('collectors', CollectorController::class);
-Route::resource('routes', RouteController::class);
-Route::resource('route-stops', RouteStopController::class);
-Route::resource('incentive-transactions', incentive_transactions::class);
-
-Route::get('/profile/edit', [Authenticator::class, 'editProfile'])->name('profile.edit');
-
-
-//STATIC PAGES 
-Route::view('/about', 'about')->name('about');
-Route::view('/contact', 'contact')->name('contact');
-
-// Settings page for logged-in resident
-Route::middleware('auth')->group(function () {
     Route::get('/settings', [ResidentController::class, 'settings'])->name('settings');
     Route::delete('/account/delete', [ResidentController::class, 'destroyAccount'])->name('account.destroy');
+
+    // ----------------------------
+    // Other resource routes (all auth-protected)
+    // ----------------------------
+    Route::resource('collectors', CollectorController::class);
+    Route::resource('routes', RouteController::class);
+    Route::resource('route-stops', RouteStopController::class);
+    Route::resource('incentive-transactions', incentive_transactions::class);
 });
 
-
-
-
-
-
+// ----------------------------
+// Static pages (public)
+// ----------------------------
+Route::view('/about', 'about')->name('about');
+Route::view('/contact', 'contact')->name('contact');

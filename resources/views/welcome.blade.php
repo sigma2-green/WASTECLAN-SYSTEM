@@ -146,7 +146,7 @@
     <nav>
         <div class="logo">♻️ </div>
         <div class="nav-links">
-            <a href="{{ route('dashboard') }}">Dashboard</a>
+            <a href="{{ route('resident.dashboard') }}">Dashboard</a>
             <a href="#">Profile</a>
         </div>
     </nav>

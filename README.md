@@ -1,108 +1,51 @@
-## ♻️ MSE AAMUE JINA 
+# WASTEMANAGEMENT SYSTEM
+Overview
 
-This system is too provide and give a chance to the community at large to make a clean and presentable environment. 
+The Waste Management System (MSE AAMUE JINA) allows residents, collectors, and admins to manage waste collection efficiently. The system promotes a clean and presentable environment by providing real-time updates, incentives, and community reporting.
 
-![IDEAS](image.png)
+User Roles:
 
-These ideas above are to be clearly applied in this system.
+Resident: Request collections, track incentives, report issues, access sorting guides.
 
+Collector: View assigned routes, update collection status, receive bin alerts, submit safety reports.
 
-##  ????? SYSTEM
-![CONCEPT SKETCH](image-1.png)
+Admin: Manage users, bins, routes, analytics, and incentive programs.
 
-## 🚀 Overview
+Project Structure & File Assignments
+1. Backend Developer
 
-This system supports three main user roles:
+Responsible for: Core system logic, controllers, models, and APIs.
+Files:
 
-- **Resident:** Requests waste collection, accesses sorting guides, earns recycling incentives, and reports issues.  
-- **Collector:** Views assigned routes, updates collection status, receives bin alerts, and submits safety reports.  
-- **Admin:** Manages users, bins, routes, and monitors analytics and community reports.
+![alt text](image-2.png)
 
----
+2. Frontend Developer
 
-## 🧩 Key Features
+Responsible for: Designing and implementing user interfaces for all dashboards.
+Files:
 
-### 👤 Resident Dashboard
-- Request and track waste collections  
-- Interactive waste sorting guide (searchable by category)  
-- Incentive program and reward tracking  
-- Submit community or environmental issue reports  
-- View personal waste analytics  
+![alt text](image-3.png)
 
-### 🚛 Collector Dashboard
-- Access assigned routes with map view  
-- Update collection status in real-time  
-- Receive bin overflow or sensor alerts  
-- Submit safety or route incident reports  
+3. Database Manager
 
-### 🛠️ Admin Panel
-- Manage users (residents, collectors, admins)  
-- Assign and monitor collection routes  
-- View system analytics and community reports  
-- Configure incentive programs and point rewards  
+Responsible for: Creating and managing tables, migrations, seeders, and reports.
+Files:
 
----
+![alt text](image-4.png)
 
-## 🧠 System Architecture
+4. Real-Time / Notifications Developer
 
-| Component | Technology |
-|------------|-------------|
-| Framework | Laravel |
-| Database | MySQL |
-| Server OS | Ubuntu |
-| IDE | VS Code |
-| Authentication | Laravel Breeze / Laravel UI |
-| Role Management | Spatie Laravel Permission |
-| Real-Time Updates | Laravel WebSockets / Pusher |
-| Charts / Reports | Chart.js / ConsoleTVs/Charts |
-| Maps | Google Maps API / Leaflet.js |
+Responsible for: Implementing live updates for bin alerts, collection status, and notifications.
+Files:
 
----
+![alt text](image-5.png)
 
-## 🗄️ Database Entities
+5. System Admin & Tester
 
-**Core tables:**
-- `users` (with roles: resident, collector, admin)  
-- `residents` (profile + household info)  
-- `collectors` (profile + vehicle info)  
-- `pickups` (waste collection requests)  
-- `routes` & `route_stops` (collection paths)  
-- `bins` (location, type, fill level)  
-- `reports` (issues & safety reports)  
-- `incentives` & `incentive_transactions` (reward tracking)
+Responsible for: Deployment, server setup, and testing the system.
+Files:
 
----
-
-| Member       | Role                      | Responsibilities                                                                        |
-| ------------ | ------------------------- | --------------------------------------------------------------------------------------- |
-| **Member 1** | **Backend Developer**     | Builds the main system logic — handles database, models, controllers, and APIs.         |
-| **Member 2** | **Frontend Developer**    | Designs and builds user interfaces (Resident, Collector, Admin dashboards).             |
-| **Member 3** | **Database Manager**      | Creates and manages tables, migrations, and reports for analytics.                      |
-| **Member 4** | **Real-Time Developer**   | Sets up live updates (for bin alerts and collection status) using WebSockets or Pusher. |
-| **Member 5** | **System Admin & Tester** | Manages the Ubuntu server, testing, and overall project deployment.                     |
-
-| Layer                       | Main Tools                              | Responsible Member |
-| --------------------------- | --------------------------------------- | ------------------ |
-| **Routing & Controllers**   | Laravel Routes & Controllers            | Member 1           |
-| **Views & Templates**       | Laravel Blade, HTML, CSS, JS            | Member 2           |
-| **Database & Models**       | MySQL, Eloquent ORM                     | Member 3           |
-| **Real-Time Communication** | Pusher / Laravel WebSockets             | Member 4           |
-| **Deployment & Testing**    | Ubuntu Server, PHPUnit, Laravel Artisan | Member 5           |
+![alt text](image-6.png)
 
 
-## 🧭 Role-Based Access Flow
 
-| User Role | Access Path | Dashboard |
-|------------|--------------|------------|
-| Resident | `/resident` | Collection, Sorting, Incentives, Reports |
-| Collector | `/collector` | Routes, Status Updates, Bin Alerts, Safety Reports |
-| Admin | `/admin` | Manage Users, Bins, Analytics |
-
-Automatic redirection after login:
-```php
-protected function authenticated(Request $request, $user)
-{
-    if ($user->role === 'resident') return redirect('/resident');
-    if ($user->role === 'collector') return redirect('/collector');
-    if ($user->role === 'admin') return redirect('/admin');
-}

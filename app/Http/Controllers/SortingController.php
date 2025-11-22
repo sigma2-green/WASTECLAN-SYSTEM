@@ -2,62 +2,113 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Sorting;
 use Illuminate\Http\Request;
+use App\Models\Sorting;
+use Illuminate\Support\Facades\Storage;
 
 class SortingController extends Controller
 {
+    /**
+     * Display all sorting guides (Resident view)
+     */
     public function index()
     {
-        $sortings = Sorting::all();
-    $sorting = null; // avoid undefined variable
-    return view('residents.sorting', compact('sortings', 'sorting'));
+        $guides = Sorting::all();
+        return view('residents.sorting', compact('guides'));
     }
 
+    /**
+     * Show form to create a new sorting guide (Admin/Collector)
+     */
     public function create()
     {
-        return view('sortings.create');
+        return view('admin.sortings.create'); // blade form for admin
     }
 
+    /**
+     * Store a new sorting guide
+     */
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'category' => 'nullable|string|max:255',
+        $validated = $request->validate([
+            'category' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'examples' => 'nullable|string',
+            'image' => 'nullable|image|max:2048', // optional image
         ]);
 
-        Sorting::create($request->all());
-        return redirect()->route('sortings.index')->with('success', 'Sorting guide created successfully.');
+        // Upload image if exists
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store('sorting_guides', 'public');
+        }
+
+        Sorting::create($validated);
+
+        return redirect()->route('sortings.index')->with('success', 'Sorting guide added successfully!');
     }
 
-    public function show(Sorting $sorting)
+    /**
+     * Show a single sorting guide (optional)
+     */
+    public function show($id)
     {
-        return view('sortings.show', compact('sorting'));
+        $guide = Sorting::findOrFail($id);
+        return view('admin.sortings.show', compact('guide'));
     }
 
-    public function edit(Sorting $sorting)
+    /**
+     * Show form to edit a sorting guide (Admin/Collector)
+     */
+    public function edit($id)
     {
-        $sortings = Sorting::all();
-        return view('residents.sorting', compact('sortings', 'sorting'));
+        $guide = Sorting::findOrFail($id);
+        return view('admin.sortings.edit', compact('guide'));
     }
 
-    public function update(Request $request, Sorting $sorting)
+    /**
+     * Update an existing sorting guide
+     */
+    public function update(Request $request, $id)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'category' => 'nullable|string|max:255',
+        $guide = Sorting::findOrFail($id);
+
+        $validated = $request->validate([
+            'category' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'examples' => 'nullable|string',
+            'image' => 'nullable|image|max:2048',
         ]);
 
-        $sorting->update($request->all());
-        return redirect()->route('sortings.index')->with('success', 'Sorting guide updated successfully.');
+        // Handle image update
+        if ($request->hasFile('image')) {
+            // delete old image if exists
+            if ($guide->image && Storage::disk('public')->exists($guide->image)) {
+                Storage::disk('public')->delete($guide->image);
+            }
+            $validated['image'] = $request->file('image')->store('sorting_guides', 'public');
+        }
+
+        $guide->update($validated);
+
+        return redirect()->route('sortings.index')->with('success', 'Sorting guide updated successfully!');
     }
 
-    public function destroy(Sorting $sorting)
+    /**
+     * Delete a sorting guide
+     */
+    public function destroy($id)
     {
-        $sorting->delete();
-        return redirect()->route('sortings.index')->with('success', 'Sorting guide deleted successfully.');
+        $guide = Sorting::findOrFail($id);
+
+        // Delete image if exists
+        if ($guide->image && Storage::disk('public')->exists($guide->image)) {
+            Storage::disk('public')->delete($guide->image);
+        }
+
+        $guide->delete();
+
+        return redirect()->route('sortings.index')->with('success', 'Sorting guide deleted successfully!');
     }
 }
+
 

@@ -12,8 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('sortings', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+         $table->id();
+         $table->string('category');       // e.g., Plastic, Organic, E-Waste
+         $table->text('description');      // Instructions for residents
+         $table->text('examples')->nullable();  // Optional, comma-separated examples
+         $table->string('image')->nullable();   // Optional image illustrating the guide
+         $table->timestamps();
+
         });
     }
 

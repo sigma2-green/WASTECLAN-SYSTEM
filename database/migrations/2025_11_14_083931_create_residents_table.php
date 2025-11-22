@@ -8,10 +8,9 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('residents', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // link to users
             $table->string('phone')->nullable();
-            $table->string('address');
+            $table->string('address')->nullable();
             $table->timestamps();
         });
     }

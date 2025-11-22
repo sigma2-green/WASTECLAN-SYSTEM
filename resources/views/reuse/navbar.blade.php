@@ -23,7 +23,7 @@
     <!-- Right: Navigation Links -->
     <div class="nav-links" style="display:flex; gap:18px; align-items:center;">
         @auth
-            <a href="{{ route('dashboard') }}" class="nav-link">Dashboard</a>
+            <a href="{{ route('resident.dashboard') }}" class="nav-link">Dashboard</a>
             <a href="{{ route('profile') }}" class="nav-link">Profile</a>
             <a href="{{ route('logout') }}" class="nav-link logout-link" 
                onclick="event.preventDefault(); document.getElementById('logout-form').submit();" style="color: red;">
