@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('incentives', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->integer('reward_value')->default(0);   // points awarded
+            $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();
         });
     }
@@ -25,3 +29,4 @@ return new class extends Migration
         Schema::dropIfExists('incentives');
     }
 };
+
