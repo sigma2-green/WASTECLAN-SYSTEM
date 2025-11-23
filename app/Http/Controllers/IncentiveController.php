@@ -3,62 +3,50 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Incentive;
 
 class IncentiveController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // Display all incentives
     public function index()
     {
-        //
+        $incentives = Incentive::all();
+        return response()->json($incentives);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    // Show a single incentive
+    public function show($id)
     {
-        //
+        $incentive = Incentive::findOrFail($id);
+        return response()->json($incentive);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // Create a new incentive
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string',
+            'amount' => 'required|numeric',
+        ]);
+
+        $incentive = Incentive::create($request->all());
+        return response()->json($incentive, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    // Update an incentive
+    public function update(Request $request, $id)
     {
-        //
+        $incentive = Incentive::findOrFail($id);
+        $incentive->update($request->all());
+        return response()->json($incentive);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    // Delete an incentive
+    public function destroy($id)
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $incentive = Incentive::findOrFail($id);
+        $incentive->delete();
+        return response()->json(null, 204);
     }
 }
+

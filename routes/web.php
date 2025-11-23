@@ -3,7 +3,8 @@
 use App\Http\Controllers\Authenticator;
 use App\Http\Controllers\BinController;
 use App\Http\Controllers\CollectorController;
-use App\Http\Controllers\incentive_transactions;
+use App\Http\Controllers\IncentiveTransactionsController;
+
 use App\Http\Controllers\IncentiveController;
 use App\Http\Controllers\PickupController;
 use App\Http\Controllers\ReportController;
@@ -127,7 +128,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('collectors', CollectorController::class);
     Route::resource('routes', RouteController::class);
     Route::resource('route-stops', RouteStopController::class);
-    Route::resource('incentive-transactions', incentive_transactions::class);
+    //Route::resource('incentives', IncentiveTransactionsController::class);
 });
 
 // ----------------------------

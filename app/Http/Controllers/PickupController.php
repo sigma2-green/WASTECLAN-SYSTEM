@@ -2,63 +2,78 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Pickup;
+use App\Models\Resident;
+use App\Models\Collector;
+use App\Models\Bin;
+use App\Models\Route;
 use Illuminate\Http\Request;
 
 class PickupController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
-        //
+        $pickups = Pickup::with(['resident', 'collector', 'bin', 'route'])->latest()->get();
+        return view('admin.manage_collection', compact('pickups'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+
     public function create()
     {
-        //
+        return view('admin.pickups.create', [
+            'residents' => Resident::all(),
+            'collectors' => Collector::all(),
+            'bins' => Bin::all(),
+            'routes' => Route::all()
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'resident_id' => 'required|exists:residents,id',
+            'bin_id' => 'required|exists:bins,id',
+            'route_id' => 'required|exists:routes,id',
+            'pickup_date' => 'required|date',
+        ]);
+
+        Pickup::create([
+            'resident_id' => $request->resident_id,
+            'collector_id' => $request->collector_id ?? null, // Admin assigns later
+            'bin_id' => $request->bin_id,
+            'route_id' => $request->route_id,
+            'pickup_date' => $request->pickup_date,
+            'status' => 'pending',
+        ]);
+
+        return redirect()->route('pickups.index')->with('success', 'Pickup created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function edit(Pickup $pickup)
     {
-        //
+        return view('admin.pickups.edit', [
+            'pickup' => $pickup,
+            'residents' => Resident::all(),
+            'collectors' => Collector::all(),
+            'bins' => Bin::all(),
+            'routes' => Route::all()
+        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function update(Request $request, Pickup $pickup)
     {
-        //
-    }
+        $request->validate([
+            'collector_id' => 'nullable|exists:collectors,id',
+            'status' => 'required|string'
+        ]);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+        $pickup->update([
+            'collector_id' => $request->collector_id,
+            'status' => $request->status
+        ]);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return redirect()->route('pickups.index')->with('success', 'Pickup updated successfully.');
     }
 }
+
