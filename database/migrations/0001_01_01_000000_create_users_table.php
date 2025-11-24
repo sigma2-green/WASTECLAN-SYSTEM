@@ -19,8 +19,8 @@ return new class extends Migration
             $table->string('password')->nullable();
             $table->string('phone')->nullable();
             $table->enum('role', ['resident', 'collector', 'admin'])->default('resident');
-            $table->string('profile_photo')->nullable()->after('password');
-            $table->string('avatar')->nullable()->after('password');
+                $table->string('profile_photo')->nullable();
+                $table->string('avatar')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
