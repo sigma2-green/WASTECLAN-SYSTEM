@@ -106,15 +106,11 @@ Route::middleware('auth')->group(function () {
     // ----------------------------
     // Resident-specific routes
     // ----------------------------
-    Route::get('/collect', function () {
-        if (auth()->user()->role !== 'resident') abort(403);
-        return view('residents.collect');
-    })->name('collect');
+    Route::get('/collect', [App\Http\Controllers\ResidentController::class, 'collect'])->name('collect');
+    Route::get('/issues', [App\Http\Controllers\ResidentController::class, 'issues'])->name('issues');
+    Route::get('/sorting-guides', [App\Http\Controllers\ResidentController::class, 'sortingGuides'])->name('sorting.guides');
 
-    Route::get('/issues', function () {
-        if (auth()->user()->role !== 'resident') abort(403);
-        return view('residents.issues');
-    })->name('issues');
+    Route::post('/issues', [App\Http\Controllers\ResidentController::class, 'storeIssue'])->name('resident.issues.store');
 
     Route::resource('residents', ResidentController::class);
     Route::resource('bins', BinController::class);
@@ -125,6 +121,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/settings', [ResidentController::class, 'settings'])->name('settings');
     Route::delete('/account/delete', [ResidentController::class, 'destroyAccount'])->name('account.destroy');
+
+    Route::post('/resident/collections/request', [App\Http\Controllers\ResidentCollectionController::class, 'requestCollection'])->name('resident.collections.request');
 
     // ----------------------------
     // Other resource routes (all auth-protected)

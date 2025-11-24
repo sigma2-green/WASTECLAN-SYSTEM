@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Resident;
 use App\Models\User;
 use \Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-
+use Illuminate\Support\Facades\Hash;
 
 class ResidentController extends Controller
 {
@@ -155,7 +155,7 @@ public function destroyAccount(Request $request)
         'password' => 'required',
     ]);
 
-    if (!\Hash::check($request->password, $user->password)) {
+    if (!Hash::check($request->password, $user->password)) {
         return back()->withErrors(['password' => 'Password does not match our records']);
     }
 
@@ -170,6 +170,58 @@ public function destroyAccount(Request $request)
     return redirect('/')->with('success', 'Your account has been deleted successfully.');
 }
 
+/**
+     * Show resident's collection history and request form
+     */
+    public function collect()
+    {
+        $resident = Auth::user()->resident;
+        if (!$resident) {
+            abort(403, 'No resident profile found for this user.');
+        }
+        $collections = \App\Models\Collection::where('resident_id', $resident->id)->with(['bin'])->latest()->get();
+        $bins = \App\Models\Bin::all();
+        return view('residents.collect', compact('collections', 'bins'));
+    }
 
+    /**
+     * Show resident's reported issues and report form
+     */
+    public function issues()
+    {
+        $resident = Auth::user()->resident;
+        $issues = \App\Models\Issue::where('resident_id', $resident->id)->latest()->get();
+        return view('residents.issues', compact('issues'));
+    }
+
+    /**
+     * Store a newly reported issue from resident
+     */
+    public function storeIssue(Request $request)
+    {
+        $resident = Auth::user()->resident;
+        $request->validate([
+            'type' => 'required|string|max:255',
+            'description' => 'required|string',
+        ]);
+
+        \App\Models\Issue::create([
+            'resident_id' => $resident->id,
+            'title' => $request->type,
+            'description' => $request->description,
+            'status' => 'open',
+        ]);
+
+        return redirect()->route('issues')->with('success', 'Issue reported successfully!');
+    }
+
+    /**
+     * Show sorting guides for residents
+     */
+    public function sortingGuides()
+    {
+        $guides = \App\Models\SafetyReport::where('report_type', 'sorting_guide')->latest()->get();
+        return view('residents.sorting', compact('guides'));
+    }
 }
 
