@@ -92,6 +92,47 @@ public function settings()
 {
     $user = Auth::user();
     return view('settings', compact('user'));
+    // List incentives for a resident
+    public function incentives(Resident $resident)
+    {
+        $incentives = $resident->incentives()->latest()->get();
+        return view('residents.incentives', compact('resident', 'incentives'));
+    }
+
+    // Add a new incentive transaction
+    public function addIncentive(Request $request, Resident $resident)
+    
+    // List incentives for a resident
+    public function incentives(Resident $resident)
+    {
+        $incentives = $resident->incentives()->latest()->get();
+        return view('residents.incentives', compact('resident', 'incentives'));
+    }
+    
+    // Add a new incentive transaction
+    public function addIncentive(Request $request, Resident $resident)
+    {
+        $request->validate([
+            'amount' => 'required|numeric',
+            'description' => 'nullable|string',
+        ]);
+        $resident->incentives()->create([
+            'amount' => $request->amount,
+            'description' => $request->description,
+        ]);
+        return redirect()->back()->with('success', 'Incentive added!');
+    }
+    {
+        $request->validate([
+            'amount' => 'required|numeric',
+            'description' => 'nullable|string',
+        ]);
+        $resident->incentives()->create([
+            'amount' => $request->amount,
+            'description' => $request->description,
+        ]);
+        return redirect()->back()->with('success', 'Incentive added!');
+    }
 }
 
 public function viewSortingGuides()

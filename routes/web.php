@@ -42,6 +42,10 @@ Route::post('/logout', [Authenticator::class, 'logout'])->name('logout');
 // ----------------------------
 Route::middleware('auth')->group(function () {
 
+    // Resident incentives routes
+    Route::get('residents/{resident}/incentives', [ResidentController::class, 'incentives'])->name('residents.incentives');
+    Route::post('residents/{resident}/incentives', [ResidentController::class, 'addIncentive'])->name('residents.incentives.add');
+
     // Resident dashboard
     Route::get('/dashboard', function () {
         if (auth()->user()->role !== 'resident') abort(403, 'Unauthorized');
